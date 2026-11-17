@@ -103,3 +103,103 @@ async def test_ikaro_split_update_readings_and_settings(
     assert device.settings.mode is IkaroMode.HEAT
     assert device.settings.fan_speed is FanSpeed.LOW
     assert device.settings.target_temp_heat == pytest.approx(22.0)
+
+
+@pytest.mark.asyncio
+async def test_ikaro_power_on_restores_default_auto_when_fan_unknown(
+    mock_modbus_unit: MockModbusUnit,
+) -> None:
+    """Verify async_set_power(True) defaults to AUTO if fan_speed is None."""
+    device = IkaroHW(mock_modbus_unit)
+    await device.async_set_power(True)
+
+    assert mock_modbus_unit.holding[28301] == 1
+    assert mock_modbus_unit.holding[28303] == FanSpeed.AUTO
+
+
+@pytest.mark.asyncio
+async def test_ikaro_power_on_restores_last_active_fan_speed(
+    mock_modbus_unit: MockModbusUnit,
+) -> None:
+    """Verify off->on restores the last active fan speed read or set."""
+    mock_modbus_unit.load_raw(
+        {
+            "input": {46801: 225},
+            "holding": {
+                28301: 1,
+                28302: IkaroMode.COOL,
+                28303: FanSpeed.MEDIUM,
+                28310: 240,
+                28311: 210,
+            },
+        }
+    )
+
+    device = IkaroHW(mock_modbus_unit)
+    await device.async_update()
+    await device.async_set_power(False)
+    assert mock_modbus_unit.holding[28303] == FanSpeed.OFF
+
+    await device.async_set_power(True)
+    assert mock_modbus_unit.holding[28301] == 1
+    assert mock_modbus_unit.holding[28303] == FanSpeed.MEDIUM
+
+
+@pytest.mark.asyncio
+async def test_ikaro_power_on_restore_fan_false_leaves_off(
+    mock_modbus_unit: MockModbusUnit,
+) -> None:
+    """Verify restore_fan=False does not write register 28303."""
+    mock_modbus_unit.load_raw(
+        {
+            "holding": {
+                28301: 0,
+                28302: IkaroMode.COOL,
+                28303: FanSpeed.OFF,
+                28310: 240,
+                28311: 210,
+            }
+        }
+    )
+
+    device = IkaroHW(mock_modbus_unit)
+    await device.async_update_settings()
+
+    events: list[WriteEvent] = []
+    mock_modbus_unit.on_write(events.append)
+
+    await device.async_set_power(True, restore_fan=False)
+
+    assert mock_modbus_unit.holding[28301] == 1
+    assert mock_modbus_unit.holding[28303] == FanSpeed.OFF
+    assert [event.address for event in events] == [28301]
+
+
+@pytest.mark.asyncio
+async def test_ikaro_power_on_does_not_rewrite_already_active_fan(
+    mock_modbus_unit: MockModbusUnit,
+) -> None:
+    """Verify async_set_power(True) skips 28303 if fan is already active."""
+    mock_modbus_unit.load_raw(
+        {
+            "holding": {
+                28301: 0,
+                28302: IkaroMode.HEAT,
+                28303: FanSpeed.LOW,
+                28310: 240,
+                28311: 210,
+            }
+        }
+    )
+
+    device = IkaroHW(mock_modbus_unit)
+    await device.async_update_settings()
+
+    events: list[WriteEvent] = []
+    mock_modbus_unit.on_write(events.append)
+
+    await device.async_set_power(True)
+
+    assert mock_modbus_unit.holding[28301] == 1
+    assert mock_modbus_unit.holding[28303] == FanSpeed.LOW
+    assert [event.address for event in events] == [28301]
