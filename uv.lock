@@ -176,8 +176,8 @@ wheels = [
 ]
 
 [[package]]
-name = "idealclima"
-version = "0.1.2"
+name = "idealclima-modbus"
+version = "0.2.0"
 source = { editable = "." }
 dependencies = [
     { name = "modbus-connection" },

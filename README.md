@@ -1,4 +1,4 @@
-# idealclima
+# idealclima-modbus
 
 Async Python library for controlling Idealclima Modbus fan coil units ([**Comfosplit IKARO HW**](https://www.idealclima.eu/it/radiantori/terminali-idronici/ikaro) and [**Radiantore SKUDO DC Inverter**](https://www.idealclima.eu/it/radiantori/terminali-idronici/radiantore-skudo-dc-inverter)), built on [`modbus-connection`](https://github.com/home-assistant-libs/modbus-connection) for Home Assistant Core integrations and standalone use.
 
@@ -13,13 +13,13 @@ Async Python library for controlling Idealclima Modbus fan coil units ([**Comfos
 For Home Assistant or when providing your own `ModbusUnit`:
 
 ```bash
-pip install idealclima
+pip install idealclima-modbus
 ```
 
 For standalone usage with `tmodbus`:
 
 ```bash
-pip install "idealclima[tmodbus]"
+pip install "idealclima-modbus[tmodbus]"
 ```
 
 ## Usage
@@ -28,7 +28,7 @@ pip install "idealclima[tmodbus]"
 import asyncio
 from modbus_connection import ModbusSerialParams
 from modbus_connection.tmodbus import ModbusConnection
-from idealclima import FanSpeed, IkaroHW, IkaroMode
+from idealclima_modbus import FanSpeed, IkaroHW, IkaroMode
 
 async def main() -> None:
     conn = ModbusConnection(
