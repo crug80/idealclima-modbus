@@ -36,6 +36,13 @@ class SkudoMode(IntEnum):
     HEAT = 4
 
 
+class SkudoRunningMode(IntEnum):
+    """Active operating regime for SKUDO DC Inverter (input register 46807)."""
+
+    COOL = 0
+    HEAT = 1
+
+
 class TemperatureUnit(IntEnum):
     """Display temperature unit for SKUDO DC Inverter (register 28319)."""
 
