@@ -10,7 +10,7 @@ from .base import (
     BaseIdealclimaReadings,
     BaseIdealclimaSettings,
 )
-from .enums import SkudoMode, TemperatureUnit
+from .enums import SkudoMode, SkudoRunningMode, TemperatureUnit
 
 
 def _validate_timer_hours(value: int) -> int:
@@ -24,7 +24,7 @@ class SkudoReadings(BaseIdealclimaReadings):
     """Input registers for Radiantore SKUDO DC Inverter (46801-46810).
 
     Uses ``max_gap = 1`` so 46801-46810 are polled in a single 0x04 request
-    while skipping 46803 and 46807.
+    while skipping 46803.
     """
 
     max_gap = 1
@@ -33,6 +33,7 @@ class SkudoReadings(BaseIdealclimaReadings):
     fan_rpm = integer(46804, signed=True, unit="rpm")
     valve_command = boolean(46805)
     power_state = boolean(46806)
+    running_mode = enum(46807, SkudoRunningMode, signed=True)
     motor_alarm = boolean(46808)
     ambient_sensor_alarm = boolean(46809)
     coil_sensor_alarm = boolean(46810)

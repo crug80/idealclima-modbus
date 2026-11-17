@@ -5,7 +5,13 @@ from __future__ import annotations
 import pytest
 from modbus_connection.mock import MockModbusUnit, WriteEvent
 
-from idealclima_modbus import FanSpeed, SkudoDCInverter, SkudoMode, TemperatureUnit
+from idealclima_modbus import (
+    FanSpeed,
+    SkudoDCInverter,
+    SkudoMode,
+    SkudoRunningMode,
+    TemperatureUnit,
+)
 
 
 @pytest.mark.asyncio
@@ -22,7 +28,7 @@ async def test_skudo_update_readings_and_settings(
                 46804: 850,
                 46805: 1,
                 46806: 1,
-                46807: 1,  # intentionally ignored
+                46807: SkudoRunningMode.HEAT,
                 46808: 0,
                 46809: 0,
                 46810: 1,
@@ -63,6 +69,7 @@ async def test_skudo_update_readings_and_settings(
     assert device.readings.fan_rpm == 850
     assert device.readings.valve_command is True
     assert device.readings.power_state is True
+    assert device.readings.running_mode is SkudoRunningMode.HEAT
     assert device.readings.motor_alarm is False
     assert device.readings.ambient_sensor_alarm is False
     assert device.readings.coil_sensor_alarm is True
@@ -89,6 +96,18 @@ async def test_skudo_update_readings_and_settings(
     assert device.settings.remote_enabled_with_key_lock is True
     assert device.settings.password_enabled is False
     assert device.settings.fan_intermittent is True
+
+
+@pytest.mark.asyncio
+async def test_skudo_running_mode_cool(mock_modbus_unit: MockModbusUnit) -> None:
+    """Verify SKUDO input register 46807 decodes COOL regime."""
+    mock_modbus_unit.load_raw({"input": {46801: 230, 46807: SkudoRunningMode.COOL}})
+
+    device = SkudoDCInverter(mock_modbus_unit)
+    report = await device.async_update_readings()
+
+    assert report.complete
+    assert device.readings.running_mode is SkudoRunningMode.COOL
 
 
 @pytest.mark.asyncio

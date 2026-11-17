@@ -45,3 +45,12 @@ async def main() -> None:
 
 asyncio.run(main())
 ```
+
+## Supported Models & Exposed Registers
+
+- **`IkaroHW`** (`Comfosplit IKARO HW`):
+  - `readings` (`0x04`): `ambient_temperature` (`46801`)
+  - `settings` (`0x03`/`0x10`): `power` (`28301`), `mode` (`28302`), `fan_speed` (`28303`), `target_temp_cool` (`28310`), `target_temp_heat` (`28311`)
+- **`SkudoDCInverter`** (`Radiantore SKUDO DC Inverter`):
+  - `readings` (`0x04`): `ambient_temperature` (`46801`), `coil_temperature` (`46802`), `fan_rpm` (`46804`), `valve_command` (`46805`), `power_state` (`46806`), `running_mode` (`46807`: `SkudoRunningMode.COOL`/`HEAT`), `motor_alarm` (`46808`), `ambient_sensor_alarm` (`46809`), `coil_sensor_alarm` (`46810`)
+  - `settings` (`0x03`/`0x10`): `power` (`28301`), `mode` (`28302`), `fan_speed` (`28303`), `key_lock` (`28304`), `sleep` (`28305`), `timer_off_hours` (`28306`), `timer_on_hours` (`28307`), `max_target_temp` (`28308`), `min_target_temp` (`28309`), `target_temp_cool` (`28310`), `target_temp_heat` (`28311`), `target_temp_auto_cool` (`28312`), `target_temp_auto_heat` (`28313`), `anti_draft_threshold` (`28314`), `anti_draft_enabled` (`28315`), `super_silence_enabled` (`28316`), `valve_present` (`28317`), `temperature_unit` (`28319`), `key_lock_enabled` (`28322`), `remote_enabled_with_key_lock` (`28323`), `password_enabled` (`28324`), `fan_intermittent` (`28327`)
