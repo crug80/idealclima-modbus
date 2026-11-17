@@ -5,7 +5,7 @@ from __future__ import annotations
 import pytest
 from modbus_connection.mock import MockModbusUnit, WriteEvent
 
-from idealclima import FanSpeed, IkaroHW, IkaroMode
+from idealclima_modbus import FanSpeed, IkaroHW, IkaroMode
 
 
 @pytest.mark.asyncio
